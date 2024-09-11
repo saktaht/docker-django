@@ -8,5 +8,7 @@ services:
       - "8000:8000"
     tty: true
     volumes:
-      - ./src/mysite:/root/app
+      - type: bind
+        source: ./src/mysite
+        target: /root/app
     command: python manage.py runserver 0.0.0.0:8000
