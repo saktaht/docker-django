@@ -5,7 +5,7 @@ services:
       dockerfile: docker/db/Dockerfile
       context: .
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -31,7 +31,7 @@ services:
         target: /root/app
     depends_on:
       - db
-    command: sh -c "sleep 3 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "sleep 3 && python manage.py runserver 0.0.0.0:8000"
     environment:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
     env_file:
