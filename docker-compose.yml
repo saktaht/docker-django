@@ -1,7 +1,25 @@
 services:
+  db:
+    container_name: docker-db
+    build: 
+      dockerfile: docker/db/Dockerfile
+      context: .
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - type: volume
+        source: db-store
+        target: /var/lib/postgresql/data
+    env_file:
+      - .env
+
   django:
     build: 
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/app/Dockerfile
       context: .
     container_name: django
     ports:
@@ -11,4 +29,13 @@ services:
       - type: bind
         source: ./src/mysite
         target: /root/app
-    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    command: sh -c "sleep 3 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    env_file:
+      - .env
+
+volumes:
+  db-store:
